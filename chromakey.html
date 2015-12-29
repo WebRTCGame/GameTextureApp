@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style type="text/css">
+        body {
+            background-color: black;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h3>Original Image</h3>
+    <img id="testImage" src='data:;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBggGBQkIBwgKCQkKDRYODQwMDRoTFBAWHxwhIB8cHh4jJzIqIyUvJR4eKzssLzM1ODg4ISo9QTw2QTI/ODUBCQoKDQsNGQ4OGTUkHiQ1NTU1NTU1NTU1NTU1NTUvNTUsNTQ1NTU1KTUsNTUtNTU1NTU1MzU1LDI1NSwsNSwpKf/AABEIAC0ALQMBIgACEQEDEQH/xAAbAAACAwADAAAAAAAAAAAAAAAFBwQGCAACA//EADUQAAEDAwIEAgcHBQAAAAAAAAECAwQABREGIRIxUWEHkRMUIkFxgcFScqGxstLwFRYyQmL/xAAZAQADAQEBAAAAAAAAAAAAAAADBAUCAQD/xAAkEQABBAIBAgcAAAAAAAAAAAABAAIDEQQhEhMxIjJBUYHB4f/aAAwDAQACEQMRAD8AeNVW663Cbg5bbDGFymtbOq4uFlk/9K957DzzUPxV1U/p7TrcW3uejn3JRabWObaAPbUO+4A+92oZ4ew2YljYS3wuFz2l7blR69eldNMZzcs3ZoIwf7pfAW7d48Uq/wBGIoUkfNW9df6rqe0H0j5iXiNjOEILT3yx7NFXra8uTxlZIA9nh/LFBJN3UJ7TCMBtDoStQBx3G9FhHWHgFoLpOJoqyaf1JA1JCL8FZCkHDrLgwto9FCitI2bqYWDV0G8xUlC3yUPtI5OJyAc/L8qd0d9uVGafZVxNuoC0HqCMivSxGM7RGP5BJLxuuHq+vbeh7iLLcDiSB9orV+0UU8NNUxJUpu0hCQsAuNr35cyD3zmvHx+szgXbL22gqbbBjPds7pP6vOlvaD6SY05HlLjLByHN+JKuoxvmmGY7MqAxE0ftBke6N/IJ2M+JPrUlyOxDWzkqDbqjniIPLGOeKruqNVzZaXkssrQkpJdKUZVw9zjYbfCoFvvku72pduuhYkFxfEy6yhPpELJHuyM5+HnVtc0s1aLQ+WJspbzzJQ4pfCUpA3zgj41UBw8EAuZR9tn5v87qYevI7zaSdub/AK1JLjiieBvCADyOf5+FaA8OZip+gLW8vdRbUnyUR9KRtwhTYK3lQnmltySEJJTlxefcke7fpWgNJ2k2LSlut6v82GEhf3jur8San500U1OjNhUMUEDalXm0Rb9aJFvnNhxh9PCofUd6z9f9C3DQ9zUp6O7LgZJakNdOiuhrR1dXG0PNlDiErSeaVDINIxyGM2E05gd3WftN31AQUoeQ2UHiQVLSFJPwOaISrwzNC83B2QFq2itrUsLPYD601JWgtOTHS49aYxWeZCcVNt2m7TaTmDAYZV9pKN/OtTvbONhCEI9VSdEaIkSJrV4vkZLCWTxRIp3Keild6ZFcrlBFAUEcABf/2Q=='
+    />
+
+    <h3>Modified Image</h3>
+    <canvas id="canvas"></canvas>
+
+    <script type="text/javascript">
+        var canvas = document.getElementById("canvas"),
+            ctx = canvas.getContext("2d"),
+            image = document.getElementById("testImage");
+
+        canvas.height = canvas.width = 45;
+        canvas.style.width = '200px';
+        canvas.style.height = '200px';
+        //ctx.drawImage(image, 0, 0 );
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        function chromaKey(imgdata, func) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+                pix[i + 3] = 255 * (!func(pix[i], pix[i + 1], pix[i + 2]));
+            }
+            imgdata.data = pix;
+            return imgdata;
+        }
+
+        function invert(imgdata) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+                pix[i] = 255 - pix[i]; // red
+                pix[i + 1] = 255 - pix[i + 1]; // green
+                pix[i + 2] = 255 - pix[i + 2]; // blue
+            }
+            imgdata.data = pix;
+            return imgdata;
+        }
+
+        function grayscale(imgdata) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+                var val = (pix[i] + pix[i + 1] + pix[i + 2]) / 3;
+                pix[i] = val;
+                pix[i + 1] = val;
+                pix[i + 2] = val;
+            }
+            imgdata.data = pix;
+            return imgdata;
+        }
+
+        function lighten(imgdata, amount) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+
+                pix[i] = Math.min(pix[i] + amount, 255);
+                pix[i + 1] = Math.min(pix[i + 1] + amount, 255);
+                pix[i + 2] = Math.min(pix[i + 2] + amount, 255);
+            }
+            imgdata.data = pix;
+            return imgdata;
+
+        }
+
+        function random(imgdata) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+
+                pix[i] = Math.random() * 255 | 0;
+                pix[i + 1] = Math.random() * 255 | 0;
+                pix[i + 2] = Math.random() * 255 | 0;
+            }
+            imgdata.data = pix;
+            return imgdata;
+
+        }
+
+        function randomAlpha(imgdata) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+
+
+                pix[i + 3] = Math.random() * 255 | 0;
+            }
+            imgdata.data = pix;
+            return imgdata;
+
+        }
+
+        function darken(imgdata, amount) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+                /*
+                                pix[i] = Math.max(pix[i] - amount, 0);
+                                pix[i + 1] = Math.max(pix[i + 1] - amount, 0);
+                                pix[i + 2] = Math.max(pix[i + 2] - amount, 0);
+                  */
+                var vals = dkn(pix[i], pix[i + 1], pix[i + 2], pix[i + 3], amount);
+                pix[i] = vals[0];
+                pix[i + 1] = vals[1];
+                pix[i + 2] = vals[2];
+                pix[i + 3] = vals[3];
+
+            }
+            imgdata.data = pix;
+            return imgdata;
+
+        }
+
+        function applyPixelFunction(imgdata, func) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+
+                var vals = func(pix[i], pix[i + 1], pix[i + 2], pix[i + 3]);
+                for (var j = 0; j < 4; j++) {
+                    if (j > 0) {
+                        pix[i + j] = vals[j];
+                    }
+                    else if (j === 0) {
+                        pix[j] = vals[j];
+                    }
+
+                }
+
+            }
+            imgdata.data = pix;
+            return imgdata;
+
+        };
+
+        function darken2(imgdata, amount) {
+            return applyPixelFunction(imgdata, dkn());
+        };
+
+        function dkn(r, g, b, a, amount) {
+
+            r = Math.max(r - amount, 0);
+            g = Math.max(g - amount, 0);
+            b = Math.max(b - amount, 0);
+            return [r, g, b, a];
+        };
+
+        function invertAlpha(imgdata) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+
+                pix[i + 3] = 255 - pix[i + 3];
+            }
+            imgdata.data = pix;
+            return imgdata;
+        };
+
+        function removeAlpha(imgdata) {
+            var pix = imgdata.data;
+            for (var i = 0, n = pix.length; i < n; i += 4) {
+
+                pix[i + 3] = 255;
+            }
+            imgdata.data = pix;
+            return imgdata;
+        };
+
+        var datas = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        /*
+                ctx.putImageData(darken(chromaKey(datas, function (r, g, b) {
+                    return b > 200 || (r > 100 && g > 200);
+                }), 50), 0, 0);
+        */
+        ctx.putImageData(darken(datas, 10), 0, 0);
+
+        /**
+         * Converts an HSL color value to RGB. Conversion formula
+         * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+         * Assumes h, s, and l are contained in the set [0, 1] and
+         * returns r, g, and b in the set [0, 255].
+         *
+         * @param   Number  h       The hue
+         * @param   Number  s       The saturation
+         * @param   Number  l       The lightness
+         * @return  Array           The RGB representation
+         */
+        function hslToRgb(h, s, l) {
+            var r, g, b;
+
+            if (s == 0) {
+                r = g = b = l; // achromatic
+            }
+            else {
+                function hue2rgb(p, q, t) {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                }
+
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return [r * 255, g * 255, b * 255];
+        }
+
+
+        /**
+         * Converts an RGB color value to HSL. Conversion formula
+         * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+         * Assumes r, g, and b are contained in the set [0, 255] and
+         * returns h, s, and l in the set [0, 1].
+         *
+         * @param   Number  r       The red color value
+         * @param   Number  g       The green color value
+         * @param   Number  b       The blue color value
+         * @return  Array           The HSL representation
+         */
+        function rgbToHsl(r, g, b) {
+            r /= 255, g /= 255, b /= 255;
+            var max = Math.max(r, g, b),
+                min = Math.min(r, g, b);
+            var h, s, l = (max + min) / 2;
+
+            if (max == min) {
+                h = s = 0; // achromatic
+            }
+            else {
+                var d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                case r:
+                    h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    h = (b - r) / d + 2;
+                    break;
+                case b:
+                    h = (r - g) / d + 4;
+                    break;
+                }
+                h /= 6;
+            }
+
+            return [h, s, l];
+        }
+
+        function setPixel(imageData, x, y, r, g, b, a) {
+            index = (x + y * imageData.width) * 4;
+            imageData.data[index + 0] = r;
+            imageData.data[index + 1] = g;
+            imageData.data[index + 2] = b;
+            imageData.data[index + 3] = a;
+        }
+    </script>
+</body>
+
+</html>
